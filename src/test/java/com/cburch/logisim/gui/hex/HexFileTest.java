@@ -147,12 +147,11 @@ public class HexFileTest {
           false, "v3.0 hex bytes addressed " + endian, otherFile, addressSize, wordSize, values);
 
       final var plainFile = new File(tempFile + ".xxd-plain");
-      final String[] cmd2 = {"xxd", "-p", tempFile.toString(), plainFile.toString()};
-      Runtime.getRuntime().exec(cmd2).waitFor();
+      Files.writeString(plainFile.toPath(), xxdPlain(bytes));
       compare(false, "v3.0 hex bytes plain " + endian, plainFile, addressSize, wordSize, values);
     }
   }
-  
+
   private static String xxdDefault(byte[] bytes) {
     final var out = new StringBuilder();
     for (var offset = 0; offset < bytes.length; offset += 16) {
@@ -162,6 +161,15 @@ public class HexFileTest {
       }
       out.append('\n');
     }
+    return out.toString();
+  }
+
+  private static String xxdPlain(byte[] bytes) {
+    final var out = new StringBuilder();
+    for (final var b : bytes) {
+      out.append(String.format("%02x", b & 0xff));
+    }
+    out.append('\n');
     return out.toString();
   }
 }
