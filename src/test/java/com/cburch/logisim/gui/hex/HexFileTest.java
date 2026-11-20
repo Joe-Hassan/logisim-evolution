@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.cburch.logisim.std.memory.MemContents;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
@@ -138,10 +139,10 @@ public class HexFileTest {
 
     if (desc.startsWith("Binary")) {
       final var endian = desc.endsWith("big-endian") ? "big-endian" : "little-endian";
+      final var bytes = Files.readAllBytes(tempFile.toPath());
 
       final var otherFile = new File(tempFile + ".xxd");
-      final String[] cmd1 = {"xxd", tempFile.toString(), otherFile.toString()};
-      Runtime.getRuntime().exec(cmd1).waitFor();
+      Files.writeString(otherFile.toPath(), xxdDefault(bytes));
       compare(
           false, "v3.0 hex bytes addressed " + endian, otherFile, addressSize, wordSize, values);
 
@@ -150,5 +151,17 @@ public class HexFileTest {
       Runtime.getRuntime().exec(cmd2).waitFor();
       compare(false, "v3.0 hex bytes plain " + endian, plainFile, addressSize, wordSize, values);
     }
+  }
+  
+  private static String xxdDefault(byte[] bytes) {
+    final var out = new StringBuilder();
+    for (var offset = 0; offset < bytes.length; offset += 16) {
+      out.append(String.format("%08x:", offset));
+      for (var i = offset; i < Math.min(offset + 16, bytes.length); i++) {
+        out.append(String.format(" %02x", bytes[i] & 0xff));
+      }
+      out.append('\n');
+    }
+    return out.toString();
   }
 }
