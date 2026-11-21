@@ -82,25 +82,25 @@ public class ValueTest {
         Arguments.of(E, E));
   }
 
-  @ParameterizedTest
+  @ParameterizedTest(name = "{0} AND {1} = {2}")
   @MethodSource("andTable")
   void and(Value a, Value b, Value expected) {
     assertEquals(expected, a.and(b));
   }
 
-  @ParameterizedTest
+  @ParameterizedTest(name = "{0} OR {1} = {2}")
   @MethodSource("orTable")
   void or(Value a, Value b, Value expected) {
     assertEquals(expected, a.or(b));
   }
 
-  @ParameterizedTest
+  @ParameterizedTest(name = "{0} XOR {1} = {2}")
   @MethodSource("xorTable")
   void xor(Value a, Value b, Value expected) {
     assertEquals(expected, a.xor(b));
   }
 
-  @ParameterizedTest
+  @ParameterizedTest(name = "NOT {0} = {1}")
   @MethodSource("notTable")
   void not(Value a, Value expected) {
     assertEquals(expected, a.not());
