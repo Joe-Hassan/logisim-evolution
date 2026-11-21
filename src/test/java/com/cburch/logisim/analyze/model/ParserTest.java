@@ -1,15 +1,16 @@
 package com.cburch.logisim.analyze.model;
 
+import static com.cburch.logisim.analyze.Strings.S;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.cburch.logisim.util.StringGetter;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 public class ParserTest {
 
@@ -48,14 +49,23 @@ public class ParserTest {
     assertEquals(expected, actual.toString());
   }
 
+  static Stream<Arguments> invalidExpressions() {
+    return Stream.of(
+        Arguments.of("(a + b", S.getter("rparenMissingError")),
+        Arguments.of("+ a", S.getter("missingLeftOperandError", "+")),
+        Arguments.of("a + d", S.getter("badVariableName", "d")),
+        Arguments.of("'a", S.getter("unexpectedApostrophe")));
+  }
+
   @ParameterizedTest
-  @ValueSource(strings = {"(a + b", "+ a", "a + d", "'a"})
-  void invalidExpressionThrows(String text) {
+  @MethodSource("invalidExpressions")
+  void invalidExpressionThrows(String text, StringGetter expected) {
     final var model = new AnalyzerModel();
     model.setVariables(
         List.of(new Var("a", 1), new Var("b", 1), new Var("c", 1)), List.of(new Var("y", 1)));
 
-    assertThrows(ParserException.class, () -> Parser.parse(text, model));
+    final var e = assertThrows(ParserException.class, () -> Parser.parse(text, model));
+    assertEquals(expected.toString(), e.getMessage());
   }
 
   @Test
