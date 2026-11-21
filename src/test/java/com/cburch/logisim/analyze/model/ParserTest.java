@@ -21,7 +21,7 @@ public class ParserTest {
         Arguments.of("a ^ b + c", "01111101"),
         Arguments.of("a + b c", "00011111"),
         Arguments.of("a * b + c", "01010111"),
-        Arguments.of("a + b * c", "00011111"),
+        Arguments.of("a + b · c", "00011111"),
         Arguments.of("!a & b | c", "01110101"),
         Arguments.of("NOT a AND b OR c", "01110101"),
         Arguments.of("(a + b)' c", "01000000"),
